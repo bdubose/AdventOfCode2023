@@ -1,6 +1,5 @@
 
 from dataclasses import dataclass
-import re
 
 @dataclass
 class PartNumber:
@@ -27,7 +26,7 @@ class Line:
                 start = ix if start == -1 else start
                 number_mem = number_mem + char
             else:
-                self.symbol_locations.append(ix + 1)
+                self.symbol_locations.append(ix + 2)
 
 
 
@@ -36,6 +35,18 @@ lines = list()
 with open('./d3_gear_ratios/data.txt', 'r') as file:
     for line in file:
         lines.append(Line(line))
+
+
+for ix, line in enumerate(lines):
+    for part in line.part_numbers:
+        if part.start_pos - 1 in line.symbol_locations or \
+            part.end_pos in line.symbol_locations or \
+            (ix > 0 and any([i for i in range(part.start_pos, part.end_pos) if i in lines[ix - 1].symbol_locations])) or \
+            (ix < len(lines) - 1 and any([i for i in range(part.start_pos, part.end_pos) if i in lines[ix + 1].symbol_locations])):
+            part.is_confirmed = True
+            
+# too high 1123059
+print(sum([ pn.value for l in lines for pn in l.part_numbers if pn.is_confirmed]))
 
 # to determine adjacency:
 # above & below: position overlap in either line-1 or line+1
