@@ -39,14 +39,16 @@ with open('./d3_gear_ratios/data.txt', 'r') as file:
 
 for ix, line in enumerate(lines):
     for part in line.part_numbers:
-        if part.start_pos - 1 in line.symbol_locations or \
+        if part.start_pos in line.symbol_locations or \
             part.end_pos in line.symbol_locations or \
             (ix > 0 and any([i for i in range(part.start_pos, part.end_pos) if i in lines[ix - 1].symbol_locations])) or \
             (ix < len(lines) - 1 and any([i for i in range(part.start_pos, part.end_pos) if i in lines[ix + 1].symbol_locations])):
             part.is_confirmed = True
             
 # too high 1123059
-print(sum([ pn.value for l in lines for pn in l.part_numbers if pn.is_confirmed]))
+# too low   326471
+confirmed = [pn for l in lines for pn in l.part_numbers if pn.is_confirmed]
+print(sum([c.value for c in confirmed]))
 
 # to determine adjacency:
 # above & below: position overlap in either line-1 or line+1
