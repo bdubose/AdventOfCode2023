@@ -62,14 +62,33 @@ on copies.card_id <= og.stop_with
 and copies.card_id > og.card_id
 ;
 
-create temp table card_counts as
-select
-  cw.card_id
-, count(*) available
-from card_collection cc
-join card_wins cw on cw.card_id = cc.card_id
-group by cw.card_id, cw.wins
-order by card_id;
+with recursive x as
+(
+  select
+    card_id
+  , wins
+  from card_wins cw
+  union all
+  select
+    card_id
+  , wins - 1
+  from x
+  where wins > 0
+)
+select *
+from x
+order by wins;
+
+-- going to swap languages
+
+-- create temp table card_counts as
+-- select
+--   cw.card_id
+-- , count(*) available
+-- from card_collection cc
+-- join card_wins cw on cw.card_id = cc.card_id
+-- group by cw.card_id, cw.wins
+-- order by card_id;
 
 
 -- 820 too low
